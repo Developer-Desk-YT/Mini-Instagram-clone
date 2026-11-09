@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fahad Social - Mini Instagram</title>
+    <!-- 1. Local CSS Dynamic URL (Flask Jinja Format) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- 2. FontAwesome Icons Remote URL (CDN Link) -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+</head>
+
+<body>
+
+    <!-- Top Fixed Navigation Header Bar Layout -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Brand App Logo -->
+            <h1 class="logo-text" onclick="window.location.href='/'" style="cursor: pointer;">Fahad<span>Social</span>
+            </h1>
+
+            <!-- Global Action Controls Panel -->
+            <div class="header-actions">
+                {% if current_user.is_authenticated %}
+                <!-- Highly Clickable Fixed Create Link Icon Button -->
+                <a href="/create" class="create-btn" title="Create">
+                    <i class="fa-solid fa-right-from-bracket"></i>Create
+                </a>
+                {% endif %}
+
+                <!-- Appearance Theme Switch Button -->
+                <button id="theme-toggle" class="nav-icon-btn" title="Toggle Appearance Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                {% if current_user.is_authenticated %}
+
+                <span class="user-badge">
+                    <i class="fa-regular fa-user"></i> @{{ current_user.username }}
+                </span>
+
+                <!-- Dedicated Red Logout Button Block -->
+                <a href="/logout" class="premium-logout-btn" title="Log Out Account Session">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Session Messaging Banner System -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert-toast">{{ msg }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Dynamic Main Content Grid Layout Mount Point Block -->
+    <main class="main-container-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Dark / Light Appearance Client-side Storage Transition Engine -->
+    <script>
+        const themeButton = document.getElementById('theme-toggle');
+        const themeIcon = themeButton.querySelector('i');
+
+        // Setup Function to manage core DOM node variations
+        function updateThemeUI(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-theme');
+                themeIcon.className = "fa-solid fa-sun"; // Mounts Sun wireframe icon
+                themeIcon.style.color = "#ffca28";      // Gold presentation tint
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeIcon.className = "fa-solid fa-moon"; // Mounts Moon wireframe icon
+                themeIcon.style.color = "";               // Drops forced styles parameters
+            }
+        }
+
+        // Initialize theme tracking setup configurations parsing rules
+        const savedTheme = localStorage.getItem('bhavi-social-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Setup initial default logical evaluation metrics mapping parameters
+        let isCurrentlyDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+        // Execute structural configuration alignment values upon document parsing completions
+        updateThemeUI(isCurrentlyDark);
+
+        // Capture user interactions context toggles to perform real-time class name alterations
+        themeButton.addEventListener('click', () => {
+            isCurrentlyDark = !isCurrentlyDark; // Alternate state value evaluation
+            localStorage.setItem('bhavi-social-theme', isCurrentlyDark ? 'dark' : 'light');
+            updateThemeUI(isCurrentlyDark);
+        });
+    </script>
+</body>
+
+</html>

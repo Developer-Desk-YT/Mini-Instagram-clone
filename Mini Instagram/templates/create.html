@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="create-page-wrapper">
+    <div class="upload-container-box">
+        <div class="box-header">
+            <a href="/" class="back-home-btn"><i class="fa-solid fa-arrow-left"></i> Cancel</a>
+            <h2>Create New Post</h2>
+        </div>
+        
+        <form action="/create" method="POST" enctype="multipart/form-data" class="standalone-upload-form">
+            <!-- Left Side Drop/Preview Frame -->
+            <div class="standalone-file-drop" id="drop-zone">
+                <div class="upload-prompt-elements" id="prompt-wrapper">
+                    <i class="fa-regular fa-images"></i>
+                    <p>Click button below to choose file</p>
+                </div>
+                <img id="live-image-preview" src="#" alt="Local Upload Preview" style="display: none; max-width: 100%; border-radius: 6px; margin-bottom: 15px;">
+                
+                <input type="file" name="file" accept="image/*" required id="standalone-file-input">
+                <label for="standalone-file-input" id="file-chosen-label" class="select-btn">Select Image File</label>
+            </div>
+            
+            <!-- Right Side Metadata Elements -->
+            <div class="standalone-form-meta">
+                <div class="current-user-info">
+                    <div class="avatar-placeholder">{{ current_user.username[:2]|upper }}</div>
+                    <span class="username">@{{ current_user.username }}</span>
+                </div>
+                <textarea name="caption" placeholder="Write a caption for this post..." rows="6" required></textarea>
+                <button type="submit" class="publish-action-btn">Publish to Feed</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const fileSelector = document.getElementById('standalone-file-input');
+    const imgPreview = document.getElementById('live-image-preview');
+    const promptWrapper = document.getElementById('prompt-wrapper');
+    const labelBtn = document.getElementById('file-chosen-label');
+
+    if (fileSelector) {
+        fileSelector.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    imgPreview.setAttribute('src', this.result);
+                    imgPreview.style.display = 'block';
+                    promptWrapper.style.display = 'none';
+                    labelBtn.textContent = "Change Selected File";
+                    labelBtn.style.background = "#52c41a";
+                });
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+</script>
+{% endblock %}

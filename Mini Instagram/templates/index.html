@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="feed-layout-container">
+    <!-- Top Level Author Filter Search -->
+    <div class="search-widget-row">
+        <form action="/" method="GET" class="search-form">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" name="search" placeholder="Search posts by author username..."
+                value="{{ search_query }}">
+            {% if search_query %}<a href="/" class="clear-btn">Clear</a>{% endif %}
+        </form>
+    </div>
+
+    <!-- Posts Stream -->
+    <main class="feed-timeline">
+        {% for post in posts %}
+        <article class="feed-card">
+            <div class="card-header">
+                <div class="author-info">
+                    <div class="avatar-placeholder">{{ post.author.username[:2]|upper }}</div>
+                    <span class="author-name">@{{ post.author.username }}</span>
+                </div>
+            </div>
+
+            <div class="card-media">
+                <img src="{{ url_for('static', filename='uploads/' + post.image) }}" alt="Post Content">
+            </div>
+            <div class="card-interactions">
+                <div class="action-buttons-row">
+                    <div class="reaction-trigger-container">
+                        <button class="interaction-icon"><i class="fa-regular fa-face-smile"></i></button>
+                        <div class="emoji-tray-popup">
+                            <form action="/react/{{ post.id }}/❤️" method="POST"><button type="submit">❤️</button>
+                            </form>
+                            <form action="/react/{{ post.id }}/😂" method="POST"><button type="submit">😂</button>
+                            </form>
+                            <form action="/react/{{ post.id }}/🤯" method="POST"><button type="submit">🤯</button>
+                            </form>
+                        </div>
+                    </div>
+                    <button class="interaction-icon" onclick="document.getElementById('cmt-{{ post.id }}').focus()"><i
+                            class="fa-regular fa-comment"></i></button>
+                </div>
+
+                <div class="active-reactions-list">
+                    {% for rxn in post.reactions %}
+                    <span class="badge-item"><strong>{{ rxn.type }}</strong> <small>{{ rxn.username }}</small></span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card-caption">
+                <p><span>@{{ post.author.username }}</span> {{ post.caption }}</p>
+            </div>
+
+            <div class="card-comments-block">
+                {% for comment in post.comments %}
+                {% if not comment.parent_id %}
+                <div class="root-comment">
+                    <p class="comment-line"><strong>{{ comment.username }}</strong> {{ comment.text }}</p>
+
+                    <div class="nested-replies-tray">
+                        {% for reply in comment.replies %}
+                        <p class="reply-line"><strong>{{ reply.username }}</strong> {{ reply.text }}</p>
+                        {% endfor %}
+
+                        <form action="/comment/{{ post.id }}" method="POST" class="inline-action-form reply-form">
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                            <input type="text" name="comment_text" placeholder="Reply to this comment..." required
+                                autocomplete="off">
+                            <button type="submit"><i class="fa-solid fa-reply"></i></button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+
+                <form action="/comment/{{ post.id }}" method="POST" class="inline-action-form main-comment-form">
+                    <input type="text" id="cmt-{{ post.id }}" name="comment_text" placeholder="Add a public comment..."
+                        required autocomplete="off">
+                    <button type="submit">Post</button>
+                </form>
+            </div>
+        </article>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-regular fa-folder-open"></i>
+            <p>No posts found. Start sharing your moments!</p>
+        </div>
+        {% endfor %}
+    </main>
+</div>
+{% endblock %}
